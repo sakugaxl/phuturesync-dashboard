@@ -3,6 +3,17 @@
   publish = "dist"
   functions = "netlify/functions"
 
+[build.environment]
+  NODE_VERSION = "20"
+  # Pass required Firebase environment variables during build
+  VITE_FIREBASE_API_KEY = "AIzaSyBj9WK72ozpnV9bDA8cEUYdtzZz9U_kk2M"
+  VITE_FIREBASE_AUTH_DOMAIN = "phuturesync.firebaseapp.com"
+  VITE_FIREBASE_PROJECT_ID = "phuturesync"
+  VITE_FIREBASE_STORAGE_BUCKET = "phuturesync.firebasestorage.app"
+  VITE_FIREBASE_MESSAGING_SENDER_ID = "484050002731"
+  VITE_FIREBASE_APP_ID = "1:484050002731:web:ad7d695435e2149ec05b6e"
+  VITE_FIREBASE_MEASUREMENT_ID = "G-NBW3W9LJ4V"
+
 # Redirects for SPA routing to allow React Router navigation
 [[redirects]]
   from = "/*"
