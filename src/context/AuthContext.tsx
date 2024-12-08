@@ -1,5 +1,5 @@
-// AuthContext.tsx
-import React, { createContext, useContext, useEffect, useState } from 'react';
+// src/context/AuthContext.tsx
+import React, { createContext, useContext, useEffect, useState } from "react";
 import {
   getAuth,
   setPersistence,
@@ -12,12 +12,12 @@ import {
   OAuthProvider,
   signInWithPopup,
   User,
-} from 'firebase/auth';
-import { getFirestore, doc, setDoc } from 'firebase/firestore';
-import '../services/firebaseConfig';
+} from "firebase/auth";
+import { getFirestore, doc, setDoc } from "firebase/firestore";
+import "../services/firebaseConfig";
 
 interface AuthContextType {
-  isAuthenticated: boolean;
+  isAuthenticated: boolean | undefined;
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string, username: string) => Promise<void>;
@@ -30,21 +30,24 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | undefined>(
+    undefined
+  );
   const auth = getAuth();
   const db = getFirestore();
 
   useEffect(() => {
     setPersistence(auth, browserLocalPersistence)
       .then(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-          setUser(user);
-          setIsAuthenticated(!!user);
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+          console.log("Auth state changed:", currentUser);
+          setUser(currentUser);
+          setIsAuthenticated(!!currentUser);
         });
         return () => unsubscribe();
       })
       .catch((error) => {
-        console.error('Error setting persistence:', error);
+        console.error("Error setting persistence:", error);
       });
   }, [auth]);
 
@@ -52,17 +55,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       await signInWithEmailAndPassword(auth, email, password);
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error("Login failed:", error);
       throw error;
     }
   };
 
   const signup = async (email: string, password: string, username: string) => {
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const user = userCredential.user;
 
-      await setDoc(doc(db, 'users', user.uid), {
+      await setDoc(doc(db, "users", user.uid), {
         email: user.email,
         username,
       });
@@ -70,7 +77,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(user);
       setIsAuthenticated(true);
     } catch (error) {
-      console.error('Signup failed:', error);
+      console.error("Signup failed:", error);
       throw error;
     }
   };
@@ -82,19 +89,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(result.user);
       setIsAuthenticated(true);
     } catch (error) {
-      console.error('Google login failed:', error);
+      console.error("Google login failed:", error);
       throw error;
     }
   };
 
   const loginWithApple = async () => {
-    const appleProvider = new OAuthProvider('apple.com');
+    const appleProvider = new OAuthProvider("apple.com");
     try {
       const result = await signInWithPopup(auth, appleProvider);
       setUser(result.user);
       setIsAuthenticated(true);
     } catch (error) {
-      console.error('Apple login failed:', error);
+      console.error("Apple login failed:", error);
       throw error;
     }
   };
@@ -106,7 +113,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, signup, loginWithGoogle, loginWithApple, logout }}>
+    <AuthContext.Provider
+      value={{
+        isAuthenticated,
+        user,
+        login,
+        signup,
+        loginWithGoogle,
+        loginWithApple,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -115,7 +132,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }
