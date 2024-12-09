@@ -7,6 +7,7 @@ import { useAuth } from "../context/AuthContext";
 const AuthSuccess = React.lazy(() => import("../pages/AuthSuccess"));
 const AuthFailure = React.lazy(() => import("../pages/AuthFailure"));
 const Settings = React.lazy(() => import("../pages/Settings"));
+const Marketing = React.lazy(() => import("../pages/Marketing"));
 const Login = React.lazy(() => import("../pages/Login"));
 const Signup = React.lazy(() => import("../pages/Signup"));
 const PrivacyPolicy = React.lazy(() => import("../pages/PrivacyPolicy"));
@@ -30,6 +31,7 @@ export default function AppRoutes() {
         <Route path="/login" element={<Login />} />
         <Route path="/auth-success" element={<AuthSuccess />} />
         <Route path="/auth-failure" element={<AuthFailure />} />
+        <Route path="/marketing" element={<Marketing />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
         <Route path="/tos" element={<TermsOfService />} />

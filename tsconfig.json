@@ -16,6 +16,6 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"],
+  "include": ["src", "../../../_PhutureDigital/frontend/src/components/insights"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
