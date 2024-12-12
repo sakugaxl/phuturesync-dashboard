@@ -1,10 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  Facebook,
-  CheckCircle2,
-  XCircle,
-  Settings2,
-} from "lucide-react";
+import { Facebook, CheckCircle2, XCircle, Settings2 } from "lucide-react";
 import axios from "axios";
 
 // Helper to handle unknown error types
