@@ -60,13 +60,16 @@ export default function IntegrationsSection() {
   });
 
   const handleConnect = (platform: string, connectUrl: string) => {
+    const userId = "currentUserId"; // TODO: Replace with actual dynamic user ID
+  
     openAuthPopup(
-      connectUrl,
+      `${connectUrl}?state=${userId}`,
       platform,
       () => setStatuses((prev) => ({ ...prev, [platform]: "connected" })),
       (err) => alert(`Error connecting ${platform}: ${getErrorMessage(err)}`)
     );
   };
+  
 
   useEffect(() => {
     const checkStatus = async (platform: string) => {
