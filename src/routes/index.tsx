@@ -12,6 +12,11 @@ const Login = React.lazy(() => import("../pages/Login"));
 const Signup = React.lazy(() => import("../pages/Signup"));
 const PrivacyPolicy = React.lazy(() => import("../pages/PrivacyPolicy"));
 const TermsOfService = React.lazy(() => import("../pages/TermsOfService"));
+const Dashboard = React.lazy(() => import("../pages/Dashboard"));
+const Insights = React.lazy(() => import("../pages/Insights"));
+const Social = React.lazy(() => import("../pages/Social"));
+const Financial = React.lazy(() => import("../pages/Financial"));
+const Security = React.lazy(() => import("../pages/Security"));
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
@@ -35,15 +40,37 @@ export default function AppRoutes() {
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
         <Route path="/tos" element={<TermsOfService />} />
-        <Route path="/" element={<Navigate to="/settings" replace />} />
-        <Route
-          path="/settings"
-          element={
-            <ProtectedRoute>
-              <Settings />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/dashboard" element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        } />
+        <Route path="/insights" element={
+          <ProtectedRoute>
+            <Insights />
+          </ProtectedRoute>
+        } />
+        <Route path="/social" element={
+          <ProtectedRoute>
+            <Social />
+          </ProtectedRoute>
+        } />
+        <Route path="/financial" element={
+          <ProtectedRoute>
+            <Financial />
+          </ProtectedRoute>
+        } />
+        <Route path="/security" element={
+          <ProtectedRoute>
+            <Security />
+          </ProtectedRoute>
+        } />
+        <Route path="/settings" element={
+          <ProtectedRoute>
+            <Settings />
+          </ProtectedRoute>
+        } />
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </Suspense>
   );

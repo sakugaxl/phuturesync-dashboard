@@ -1,17 +1,16 @@
 import React from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
-import { 
-  // LayoutDashboard, 
-  // DollarSign, 
-  TrendingUp, 
-  // Brain, 
-  // Share2, 
-  // Users, 
-  Settings, 
+import { NavLink } from 'react-router-dom';
+import {
+  LayoutDashboard,
+  DollarSign,
+  TrendingUp,
+  Brain,
+  Share2,
+  Settings,
   Shield,
   Menu,
   X,
-  Zap
+  Zap,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -19,32 +18,27 @@ interface SidebarProps {
 }
 
 const menuItems = [
-//  { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
+  { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
   { icon: TrendingUp, label: 'Marketing Campaigns', path: '/marketing' },
-//  { icon: Brain, label: 'AI Insights', path: '/insights' },
-//  { icon: Share2, label: 'Social Media', path: '/social' },
-//  { icon: DollarSign, label: 'Financial Overview', path: '/financial' },
-//  { icon: Users, label: 'Client Portal', path: '/clients' },
+  { icon: Brain, label: 'AI Insights', path: '/insights' },
+  { icon: Share2, label: 'Social Media', path: '/social' },
+  { icon: DollarSign, label: 'Financial Overview', path: '/financial' },
   { icon: Settings, label: 'Settings', path: '/settings' },
-//  { icon: Shield, label: 'Security', path: '/security' }
+  { icon: Shield, label: 'Security', path: '/security' },
 ];
 
 export default function Sidebar({ onClose }: SidebarProps) {
   const [isOpen, setIsOpen] = React.useState(true);
-  const navigate = useNavigate();
 
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen);
-  };
-
-  const handleSignOut = () => {
-    localStorage.removeItem('auth_token'); // Clear authentication token
-    navigate('/login'); // Redirect user to login page
-  };
+  const toggleSidebar = () => setIsOpen((prev) => !prev);
 
   return (
-    <div className={`bg-[#212121] text-white h-full transition-all duration-300 ${isOpen ? 'w-64' : 'w-20'}`}>
-      {/* Header Section */}
+    <div
+      className={`bg-[#212121] text-white h-full transition-all duration-300 ${
+        isOpen ? 'w-64' : 'w-20'
+      }`}
+    >
+      {/* Header */}
       <div className="p-4 flex items-center justify-between">
         {isOpen ? (
           <div className="flex items-center">
@@ -59,7 +53,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
         )}
 
         <div className="flex items-center">
-          <button 
+          <button
             onClick={toggleSidebar}
             className="p-2 hover:bg-gray-800 rounded-lg hidden lg:block"
             aria-label={isOpen ? 'Collapse sidebar' : 'Expand sidebar'}
@@ -75,43 +69,35 @@ export default function Sidebar({ onClose }: SidebarProps) {
           </button>
         </div>
       </div>
-      
-      {/* Menu Items */}
+
+      {/* Navigation */}
       <nav className="mt-8">
         {menuItems.map((item) => (
           <NavLink
             key={item.path}
             to={item.path}
-            onClick={() => onClose()}
-            className={({ isActive }) => `
-              flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors relative
-              ${isActive ? 'bg-gray-800 text-white' : ''}
-            `}
+            onClick={onClose}
+            className={({ isActive }) =>
+              `
+                flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors relative
+                ${isActive ? 'bg-gray-800 text-white' : ''}
+              `
+            }
             title={item.label}
           >
             <div className={`${!isOpen ? 'mx-auto' : ''}`}>
               <item.icon size={20} />
             </div>
-            <span 
-              className={`ml-4 transition-all duration-200 ${
-                isOpen ? 'opacity-100 w-auto' : 'opacity-0 w-0 overflow-hidden'
-              }`}
+            <span
+              className={`
+                ml-4 transition-all duration-200
+                ${isOpen ? 'opacity-100 w-auto' : 'opacity-0 w-0 overflow-hidden'}
+              `}
             >
               {item.label}
             </span>
-            {/* Active indicator */}
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-blue-500 rounded-l-full opacity-0 transition-opacity" />
           </NavLink>
         ))}
-
-        {/* Sign Out Button */}
-        <button
-          onClick={handleSignOut}
-          className={`flex items-center px-4 py-3 mt-4 text-gray-300 hover:bg-red-600 hover:text-white transition-colors rounded-lg`}
-        >
-          <Shield className="mr-2" size={20} />
-          <span>Sign Out</span>
-        </button>
       </nav>
     </div>
   );
