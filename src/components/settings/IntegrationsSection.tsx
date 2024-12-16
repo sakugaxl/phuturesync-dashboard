@@ -1,8 +1,9 @@
+// IntegrationsSection.tsx (Frontend)
 import { useEffect, useState } from "react";
 import { Facebook, CheckCircle2, XCircle, Settings2 } from "lucide-react";
 import axios from "axios";
+import { useAuth } from "../../context/AuthContext"; // Get user UID from AuthContext
 
-// Helper to handle unknown error types
 function getErrorMessage(err: unknown): string {
   if (err instanceof Error) {
     return err.message;
@@ -12,19 +13,14 @@ function getErrorMessage(err: unknown): string {
 
 function openAuthPopup(url: string, platform: string, onSuccess: () => void, onError: (err: any) => void) {
   const popup = window.open(url, "_blank", "width=600,height=600");
-
   if (popup) {
     const interval = setInterval(async () => {
       if (popup.closed) {
         clearInterval(interval);
-
         try {
-          const response = await axios.get(
-            `${import.meta.env.VITE_API_URL}/auth/${platform}/status`,
-            {
-              params: { userId: "currentUserId" }, // Adjust dynamically
-            }
-          );
+          const response = await axios.get(`${import.meta.env.VITE_API_URL}/auth/${platform}/status`, {
+            params: { userId: "currentUserId" },
+          });
           if (response.data.isConnected) {
             onSuccess();
           } else {
@@ -55,21 +51,20 @@ const statusColors = {
 };
 
 export default function IntegrationsSection() {
+  const { user } = useAuth();
+  const userId = user?.uid;
   const [statuses, setStatuses] = useState<Record<string, "connected" | "not-connected">>({
     facebook: "not-connected",
   });
 
   const handleConnect = (platform: string, connectUrl: string) => {
-    const userId = "currentUserId"; // TODO: Replace with actual dynamic user ID
-  
     openAuthPopup(
-      `${connectUrl}?state=${userId}`,
-      platform,
-      () => setStatuses((prev) => ({ ...prev, [platform]: "connected" })),
+      `${connectUrl}?userId=${userId}`, 
+      platform, 
+      () => setStatuses((prev) => ({ ...prev, [platform]: "connected" })), 
       (err) => alert(`Error connecting ${platform}: ${getErrorMessage(err)}`)
     );
   };
-  
 
   useEffect(() => {
     const checkStatus = async (platform: string) => {
@@ -77,7 +72,7 @@ export default function IntegrationsSection() {
         const response = await axios.get(
           `${import.meta.env.VITE_API_URL}/auth/${platform}/status`,
           {
-            params: { userId: "currentUserId" },
+            params: { userId },
           }
         );
         if (response.data.isConnected) {
@@ -91,7 +86,7 @@ export default function IntegrationsSection() {
     integrations.forEach(({ name }) =>
       checkStatus(name.toLowerCase().replace(" ", ""))
     );
-  }, []);
+  }, [userId]);
 
   return (
     <div className="bg-white rounded-xl shadow-sm p-6">
