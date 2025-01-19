@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { BarChart3 } from 'lucide-react';
-import LoadingSpinner from '../../../../../../_PhutureDigital/frontend/src/components/LoadingSpinner';
-import { api } from '../../../../../../_PhutureDigital/frontend/src/services/api';
+import LoadingSpinner from '../LoadingSpinner';
+import { api } from '../../services/api';
 
 interface Metric {
   name: string;

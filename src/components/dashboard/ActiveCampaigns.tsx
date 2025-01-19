@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Play, Pause } from 'lucide-react'; // Removed unused imports like BarChart3, Settings, Facebook, Instagram, Linkedin
 import { FaTiktok } from 'react-icons/fa';
-import { api } from '../../../../../../_PhutureDigital/frontend/src/services/api';
-import LoadingSpinner from '../../../../../../_PhutureDigital/frontend/src/components/LoadingSpinner';
+import { api } from '../../services/api';
+import LoadingSpinner from '../LoadingSpinner';
 
 interface Campaign {
   id: number;

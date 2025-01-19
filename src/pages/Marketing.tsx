@@ -3,16 +3,19 @@ import {
   TrendingUp, 
   Target, 
   Users, 
+  Calendar, 
+  Filter, 
+  BarChart3, 
   DollarSign, 
-  // ChevronDown, 
-  // ChevronUp 
+  ChevronDown, 
+  ChevronUp 
 } from 'lucide-react';
 import DashboardCard from '../components/DashboardCard';
 import CampaignList from '../components/marketing/CampaignList';
 import MarketingFilters from '../components/marketing/MarketingFilters';
 import PerformanceChart from '../components/marketing/PerformanceChart';
 import TopPerformers from '../components/marketing/TopPerformers';
-import { api } from '../services/api.ts';
+import { fetchMarketingData } from '../services/api';
 
 export default function Marketing() {
   const [timeframe, setTimeframe] = useState('monthly');
@@ -22,7 +25,7 @@ export default function Marketing() {
   const [isTopPerformersVisible, setIsTopPerformersVisible] = useState(true);
   const [isActiveCampaignsVisible, setIsActiveCampaignsVisible] = useState(true);
 
-  const [dashboardData, setDashboardData] = useState<any>(null);
+  const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -30,7 +33,7 @@ export default function Marketing() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const data = await api.fetchMarketingData(timeframe);
+        const data = await fetchMarketingData(timeframe);
         setDashboardData(data);
         setError(null);
       } catch (err) {
@@ -86,28 +89,92 @@ export default function Marketing() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <DashboardCard
           title="Active Campaigns"
-          value={dashboardData?.activeCampaigns ?? 0}
+          value={dashboardData.activeCampaigns}
           icon={<TrendingUp className="text-blue-500" />}
-          trend={{ value: dashboardData?.trends?.campaigns?.value ?? 0, isPositive: dashboardData?.trends?.campaigns?.isPositive ?? true }}
+          trend={{ value: dashboardData.trends.campaigns.value, isPositive: dashboardData.trends.campaigns.isPositive }}
         />
         <DashboardCard
           title="Total Reach"
-          value={dashboardData?.totalReach ?? 0}
+          value={dashboardData.totalReach}
           icon={<Target className="text-purple-500" />}
-          trend={{ value: dashboardData?.trends?.reach?.value ?? 0, isPositive: dashboardData?.trends?.reach?.isPositive ?? true }}
+          trend={{ value: dashboardData.trends.reach.value, isPositive: dashboardData.trends.reach.isPositive }}
         />
         <DashboardCard
           title="Conversions"
-          value={dashboardData?.conversions ?? 0}
+          value={dashboardData.conversions}
           icon={<Users className="text-green-500" />}
-          trend={{ value: dashboardData?.trends?.conversions?.value ?? 0, isPositive: dashboardData?.trends?.conversions?.isPositive ?? true }}
+          trend={{ value: dashboardData.trends.conversions.value, isPositive: dashboardData.trends.conversions.isPositive }}
         />
         <DashboardCard
           title="Ad Spend"
-          value={dashboardData?.adSpend ?? 0}
+          value={dashboardData.adSpend}
           icon={<DollarSign className="text-orange-500" />}
-          trend={{ value: dashboardData?.trends?.adSpend?.value ?? 0, isPositive: dashboardData?.trends?.adSpend?.isPositive ?? true }}
+          trend={{ value: dashboardData.trends.adSpend.value, isPositive: dashboardData.trends.adSpend.isPositive }}
         />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div className="lg:col-span-2">
+          <div className="bg-white rounded-xl shadow-sm">
+            <div 
+              className="p-6 border-b border-gray-100 flex items-center justify-between cursor-pointer"
+              onClick={() => setIsPerformanceVisible(!isPerformanceVisible)}
+            >
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Performance Overview</h3>
+                <p className="text-sm text-gray-500">Track your campaign metrics over time</p>
+              </div>
+              <div className="flex items-center">
+                <select className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 mr-4">
+                  <option>Reach</option>
+                  <option>Engagement</option>
+                  <option>Conversions</option>
+                </select>
+                {isPerformanceVisible ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+              </div>
+            </div>
+            <div className={`transition-all duration-300 ${isPerformanceVisible ? 'p-6' : 'h-0 overflow-hidden'}`}>
+              <PerformanceChart />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm">
+          <div 
+            className="p-6 border-b border-gray-100 flex items-center justify-between cursor-pointer"
+            onClick={() => setIsTopPerformersVisible(!isTopPerformersVisible)}
+          >
+            <h3 className="text-lg font-semibold text-gray-900">Top Performers</h3>
+            {isTopPerformersVisible ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+          </div>
+          <div className={`transition-all duration-300 ${isTopPerformersVisible ? 'p-6' : 'h-0 overflow-hidden'}`}>
+            <TopPerformers />
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-xl shadow-sm">
+        <div 
+          className="p-6 border-b border-gray-100 flex items-center justify-between cursor-pointer"
+          onClick={() => setIsActiveCampaignsVisible(!isActiveCampaignsVisible)}
+        >
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900">Active Campaigns</h3>
+            <p className="text-sm text-gray-500">Manage and monitor your running campaigns</p>
+          </div>
+          <div className="flex items-center space-x-2">
+            <button className="p-2 hover:bg-gray-100 rounded-lg">
+              <Filter size={20} className="text-gray-500" />
+            </button>
+            <button className="p-2 hover:bg-gray-100 rounded-lg">
+              <BarChart3 size={20} className="text-gray-500" />
+            </button>
+            {isActiveCampaignsVisible ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+          </div>
+        </div>
+        <div className={`transition-all duration-300 ${isActiveCampaignsVisible ? 'p-6' : 'h-0 overflow-hidden'}`}>
+          <CampaignList platform={platform} status={status} />
+        </div>
       </div>
     </>
   );

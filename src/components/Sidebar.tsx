@@ -1,16 +1,17 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import {
-  LayoutDashboard,
-  DollarSign,
-  TrendingUp,
-  Brain,
-  Share2,
-  Settings,
+import { 
+  LayoutDashboard, 
+  DollarSign, 
+  TrendingUp, 
+  Brain, 
+  Share2, 
+  Users, 
+  Settings, 
   Shield,
   Menu,
   X,
-  Zap,
+  Zap
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -24,7 +25,7 @@ const menuItems = [
   { icon: Share2, label: 'Social Media', path: '/social' },
   { icon: DollarSign, label: 'Financial Overview', path: '/financial' },
   { icon: Settings, label: 'Settings', path: '/settings' },
-  { icon: Shield, label: 'Security', path: '/security' },
+  { icon: Shield, label: 'Security', path: '/security' }
 ];
 
 export default function Sidebar({ onClose }: SidebarProps) {
@@ -72,7 +73,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
 
       {/* Navigation */}
       <nav className="mt-8">
-        {menuItems.map((item) => (
+        {menuItems.map((item) =>
           <NavLink
             key={item.path}
             to={item.path}
@@ -97,7 +98,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
               {item.label}
             </span>
           </NavLink>
-        ))}
+        )}
       </nav>
     </div>
   );

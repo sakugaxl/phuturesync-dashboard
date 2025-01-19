@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
+
 const Signup: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -9,22 +10,24 @@ const Signup: React.FC = () => {
   const [username, setUsername] = useState('');
   const [error, setError] = useState<string | null>(null);
 
-  const { signup, loginWithGoogle, loginWithApple } = useAuth();
+  const { signup, loginWithGoogle, loginWithApple, loginWithFacebook } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-
+  
+    // Check if passwords match
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
     }
-
+  
     try {
       await signup(email, password, username);
-      navigate('/dashboard');
+      navigate('/settings');
     } catch (error: any) {
+      // Handle different Firebase errors
       if (error.code === 'auth/email-already-in-use') {
         setError("This email is already in use. Please try a different one.");
       } else if (error.code === 'auth/invalid-email') {
@@ -36,11 +39,10 @@ const Signup: React.FC = () => {
       }
     }
   };
-
   const handleGoogleSignup = async () => {
     try {
       await loginWithGoogle();
-      navigate('/dashboard');
+      navigate('/settings');
     } catch (error) {
       setError("Google signup failed. Please try again.");
     }
@@ -54,6 +56,17 @@ const Signup: React.FC = () => {
       setError("Apple signup failed. Please try again.");
     }
   };
+
+
+
+const handleFacebookSignup = async () => {
+  try {
+    await loginWithFacebook();
+    navigate('/settings');
+  } catch (error) {
+    setError('Facebook signup failed. Please try again.');
+  }
+};
 
   return (
     <div className="bg-white shadow-md rounded-lg p-8 max-w-md mx-auto">
@@ -103,8 +116,9 @@ const Signup: React.FC = () => {
         Sign Up with Google
       </button>
 
-      <button onClick={handleAppleSignup} className="btn btn-primary w-full bg-black hover:bg-gray-800 mt-4">
-        Sign Up with Apple
+
+      <button onClick={handleFacebookSignup} className="btn btn-primary w-full bg-blue-500 hover:bg-blue-600 mt-4">
+        Sign Up with Facebook
       </button>
 
       <p className="mt-4 text-center">

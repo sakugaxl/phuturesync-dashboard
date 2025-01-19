@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Upload } from 'lucide-react';
+import { db, setDoc, doc, storage, auth, getDoc } from '../firebaseconfig/firebaseconfig'; 
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage'; // Firebase Storage imports
 
 export default function ProfileSection() {
   const [formData, setFormData] = useState({
@@ -12,17 +14,94 @@ export default function ProfileSection() {
     phone: '',
     website: '',
   });
+  const [logo, setLogo] = useState<File | null>(null); // State for logo
+
+  useEffect(() => {
+    const userId = auth.currentUser?.uid;
+    if (userId) {
+      const docRef = doc(db, 'users', userId);
+      getDoc(docRef).then((doc) => {
+        if (doc.exists()) {
+          const data = doc.data();
+          console.log(data)
+          setFormData(data);
+        }
+      }).catch((error) => {
+        console.error('Error getting document:', error);
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    const storedFormData = localStorage.getItem('formData');
+    if (storedFormData) {
+      setFormData(JSON.parse(storedFormData));
+    }
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { id, value } = e.target;
     setFormData((prev) => ({ ...prev, [id]: value }));
+    localStorage.setItem('formData', JSON.stringify({ ...prev, [id]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Form data submitted:', formData);
-    // Add form validation and API call logic here
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files ? e.target.files[0] : null;
+    if (file) {
+      setLogo(file);
+    }
   };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    localStorage.setItem('formData', JSON.stringify(formData));
+
+    // Handle file upload to Firebase Storage if logo is selected
+    if (logo) {
+      const storageRef = ref(storage, `logos/${logo.name}`);
+      const uploadTask = uploadBytesResumable(storageRef, logo);
+      uploadTask.on(
+        'state_changed',
+        (snapshot) => {
+          // Handle progress
+        },
+        (error) => {
+          console.error('Error uploading logo:', error);
+          alert('Error uploading logo');
+        },
+        async () => {
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          // Save the form data along with the logo URL
+          const userId = auth.currentUser?.uid; // Get user ID from Firebase Auth
+          if (userId) {
+            try {
+              await setDoc(doc(db, 'users', userId), {
+                ...formData,
+                logoURL: downloadURL,
+              });
+              alert('Data saved successfully');
+            } catch (error) {
+              console.error('Error saving data to Firestore:', error);
+              alert('Error saving data');
+            }
+          }
+        }
+      );
+    } else {
+      // Save data without logo
+      const userId = auth.currentUser?.uid;
+      if (userId) {
+        try {
+          await setDoc(doc(db, 'users', userId), formData);
+          alert('Data saved successfully');
+        } catch (error) {
+          console.error('Error saving data to Firestore:', error);
+          alert('Error saving data');
+        }
+      }
+    }
+  };
+
 
   return (
     <div className="bg-white rounded-xl shadow-sm p-6">

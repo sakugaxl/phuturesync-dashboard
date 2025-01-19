@@ -1,31 +1,24 @@
-// src/routes/index.tsx
-import React, { Suspense } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
-import LoadingSpinner from "../components/LoadingSpinner";
-import { useAuth } from "../context/AuthContext";
+import React, { Suspense } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import LoadingSpinner from '../components/LoadingSpinner';
+import { useAuth } from '../context/AuthContext';
 
+// Lazy load pages
 const AuthSuccess = React.lazy(() => import("../pages/AuthSuccess"));
 const AuthFailure = React.lazy(() => import("../pages/AuthFailure"));
-const Settings = React.lazy(() => import("../pages/Settings"));
-const Marketing = React.lazy(() => import("../pages/Marketing"));
-const Login = React.lazy(() => import("../pages/Login"));
-const Signup = React.lazy(() => import("../pages/Signup"));
-const PrivacyPolicy = React.lazy(() => import("../pages/PrivacyPolicy"));
-const TermsOfService = React.lazy(() => import("../pages/TermsOfService"));
-const Dashboard = React.lazy(() => import("../pages/Dashboard"));
-const Insights = React.lazy(() => import("../pages/Insights"));
-const Social = React.lazy(() => import("../pages/Social"));
-const Financial = React.lazy(() => import("../pages/Financial"));
-const Security = React.lazy(() => import("../pages/Security"));
+const Dashboard = React.lazy(() => import('../pages/Dashboard'));
+const Financial = React.lazy(() => import('../pages/Financial'));
+const Marketing = React.lazy(() => import('../pages/Marketing'));
+const Insights = React.lazy(() => import('../pages/Insights'));
+const Social = React.lazy(() => import('../pages/Social'));
+const Settings = React.lazy(() => import('../pages/Settings'));
+// const Security = React.lazy(() => import('../pages/Security'));
+const Login = React.lazy(() => import('../pages/Login'));
+const Signup = React.lazy(() => import('../pages/Signup'));
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
-
-  if (isAuthenticated === undefined) {
-    return <LoadingSpinner />;
-  }
-
-  return isAuthenticated ? children : <Navigate to="/login" replace />;
+  return isAuthenticated ? children : <Navigate to="/login" />;
 }
 
 export default function AppRoutes() {
@@ -36,41 +29,21 @@ export default function AppRoutes() {
         <Route path="/login" element={<Login />} />
         <Route path="/auth-success" element={<AuthSuccess />} />
         <Route path="/auth-failure" element={<AuthFailure />} />
+        <Route path="/" element={<Navigate to="/settings" replace />} />
+        <Route path="/settings" element={ <Settings />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/"
+          element={<Navigate to="/settings" replace />} // Redirect root path to Settings
+        />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/financial" element={<Financial />} />
         <Route path="/marketing" element={<Marketing />} />
-        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-        <Route path="/terms-of-service" element={<TermsOfService />} />
-        <Route path="/tos" element={<TermsOfService />} />
-        <Route path="/dashboard" element={
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
-        } />
-        <Route path="/insights" element={
-          <ProtectedRoute>
-            <Insights />
-          </ProtectedRoute>
-        } />
-        <Route path="/social" element={
-          <ProtectedRoute>
-            <Social />
-          </ProtectedRoute>
-        } />
-        <Route path="/financial" element={
-          <ProtectedRoute>
-            <Financial />
-          </ProtectedRoute>
-        } />
-        <Route path="/security" element={
-          <ProtectedRoute>
-            <Security />
-          </ProtectedRoute>
-        } />
-        <Route path="/settings" element={
-          <ProtectedRoute>
-            <Settings />
-          </ProtectedRoute>
-        } />
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/insights" element={<Insights />} />
+        <Route path="/social" element={<Social />} />
+        <Route path="/settings" element={<Settings />} />
+        {/* <Route path="/security" element={<ProtectedRoute><Security /></ProtectedRoute>} /> */}
       </Routes>
     </Suspense>
   );
