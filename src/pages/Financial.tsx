@@ -4,7 +4,7 @@ import DashboardCard from '../components/DashboardCard';
 import TimeframeFilter from '../components/TimeframeFilter';
 import FinancialChart from '../components/FinancialChart';
 import ExpensesPieChart from '../components/ExpensesPieChart';
-import { fetchFinancialData } from '../services/api';
+// import { fetchFinancialData } from '../services/api';
 
 export default function Financial() {
   const [timeframe, setTimeframe] = useState('monthly');
@@ -13,24 +13,24 @@ export default function Financial() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const loadFinancialData = async () => {
-      try {
-        setLoading(true);
-        const { financial, expenses } = await fetchFinancialData(timeframe);
-        setFinancialData(financial);
-        setExpensesData(expenses);
-        setError(null);
-      } catch (err) {
-        console.error('Failed to fetch financial data:', err);
-        setError('Unable to load financial data. Please try again later.');
-      } finally {
-        setLoading(false);
-      }
-    };
+  // useEffect(() => {
+  //   const loadFinancialData = async () => {
+  //     try {
+  //       setLoading(true);
+  //       const { financial, expenses } = await fetchFinancialData(timeframe);
+  //       setFinancialData(financial);
+  //       setExpensesData(expenses);
+  //       setError(null);
+  //     } catch (err) {
+  //       console.error('Failed to fetch financial data:', err);
+  //       setError('Unable to load financial data. Please try again later.');
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-    loadFinancialData();
-  }, [timeframe]);
+  //   loadFinancialData();
+  // }, [timeframe]);
 
   if (loading) {
     return <p className="text-center text-gray-500">Loading financial data...</p>;

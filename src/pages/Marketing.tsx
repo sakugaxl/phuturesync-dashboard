@@ -15,7 +15,7 @@ import CampaignList from '../components/marketing/CampaignList';
 import MarketingFilters from '../components/marketing/MarketingFilters';
 import PerformanceChart from '../components/marketing/PerformanceChart';
 import TopPerformers from '../components/marketing/TopPerformers';
-import { fetchMarketingData } from '../services/api';
+// import { fetchMarketingData } from '../services/api';
 
 export default function Marketing() {
   const [timeframe, setTimeframe] = useState('monthly');
@@ -29,23 +29,23 @@ export default function Marketing() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const data = await fetchMarketingData(timeframe);
-        setDashboardData(data);
-        setError(null);
-      } catch (err) {
-        console.error('Error fetching marketing data:', err);
-        setError('Failed to load marketing data. Please try again later.');
-      } finally {
-        setLoading(false);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       setLoading(true);
+  //       const data = await fetchMarketingData(timeframe);
+  //       setDashboardData(data);
+  //       setError(null);
+  //     } catch (err) {
+  //       console.error('Error fetching marketing data:', err);
+  //       setError('Failed to load marketing data. Please try again later.');
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-    fetchData();
-  }, [timeframe]);
+  //   fetchData();
+  // }, [timeframe]);
 
   if (loading) {
     return <p className="text-center text-gray-500">Loading marketing data...</p>;

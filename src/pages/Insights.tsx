@@ -12,7 +12,7 @@ import {
 import DashboardCard from '../components/DashboardCard';
 import InsightCard from '../components/insights/InsightCard';
 import PerformanceChart from '../components/insights/PerformanceChart';
-import { fetchInsightsData } from '../services/api';
+// import { fetchInsightsData } from '../services/api';
 
 export default function Insights() {
   const [insights, setInsights] = useState([]);
@@ -23,23 +23,23 @@ export default function Insights() {
   const [isGrowthVisible, setIsGrowthVisible] = useState(true);
   const [isCustomerVisible, setIsCustomerVisible] = useState(true);
 
-  useEffect(() => {
-    const loadInsights = async () => {
-      try {
-        setLoading(true);
-        const data = await fetchInsightsData();
-        setInsights(data);
-        setError(null);
-      } catch (err) {
-        console.error('Error fetching insights:', err);
-        setError('Unable to load insights data. Please try again later.');
-      } finally {
-        setLoading(false);
-      }
-    };
+  // useEffect(() => {
+  //   const loadInsights = async () => {
+  //     try {
+  //       setLoading(true);
+  //       const data = await fetchInsightsData();
+  //       setInsights(data);
+  //       setError(null);
+  //     } catch (err) {
+  //       console.error('Error fetching insights:', err);
+  //       setError('Unable to load insights data. Please try again later.');
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-    loadInsights();
-  }, []);
+  //   loadInsights();
+  // }, []);
 
   if (loading) {
     return <p className="text-center text-gray-500">Loading insights...</p>;
