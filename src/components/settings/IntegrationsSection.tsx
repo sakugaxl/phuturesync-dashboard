@@ -88,17 +88,41 @@ export default function IntegrationsSection() {
 
   // Handle the connection for Facebook
   const handleConnect = async (platform: string) => {
-    if (platform === "facebook") {
-      const provider = new FacebookAuthProvider();
+    try {
+      const integration = integrations.find(i => i.name.toLowerCase().replace(" ", "") === platform);
+      
+      if (!integration) {
+        throw new Error('Integration not found');
+      }
 
-      try {
+      if (platform === "facebook") {
+        const provider = new FacebookAuthProvider();
+        provider.addScope('email');
+        provider.addScope('public_profile');
+        provider.addScope('pages_show_list');
+        
         const result = await signInWithPopup(auth, provider);
-        const accessToken = FacebookAuthProvider.credentialFromResult(result)?.accessToken;
+        const credential = FacebookAuthProvider.credentialFromResult(result);
+        const accessToken = credential?.accessToken;
 
         if (accessToken && user) {
-          alert("Facebook connected successfully!");
+          // Call your backend to store the token
+          const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/facebook/callback`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+              accessToken,
+              userId: user.uid 
+            }),
+          });
 
-          // Update the status in the Firestore
+          if (!response.ok) {
+            throw new Error('Failed to store Facebook credentials');
+          }
+
+          // Update Firestore
           const userRef = doc(db, "users", user.uid);
           await setDoc(userRef, {
             integrations: {
@@ -107,13 +131,20 @@ export default function IntegrationsSection() {
             },
           }, { merge: true });
 
-          // Update the statuses in state
-          const newStatuses = { ...statuses, [platform]: "connected" };
-          setStatuses(newStatuses);
+          setStatuses(prev => ({
+            ...prev,
+            [platform]: "connected"
+          }));
+
+          alert("Facebook connected successfully!");
         }
-      } catch (error) {
-        alert(`Error connecting to ${platform}: ${error.message}`);
+      } else {
+        // For other platforms, redirect to their auth URL
+        window.location.href = integration.connectUrl;
       }
+    } catch (error: any) {
+      console.error(`Error connecting to ${platform}:`, error);
+      alert(`Error connecting to ${platform}: ${error.message}`);
     }
   };
 
@@ -126,7 +157,7 @@ export default function IntegrationsSection() {
     <div className="bg-white rounded-xl shadow-sm p-6">
       <h3 className="text-lg font-semibold text-gray-900 mb-4">Integrations</h3>
       <div className="grid gap-4">
-        {integrations.map(({ name, icon: Icon, color, connectUrl }) => {
+        {integrations.map(({ name, icon: Icon, color }) => {
           const platform = name.toLowerCase().replace(" ", "");
           const isConnected = statuses[platform] === "connected";
 
