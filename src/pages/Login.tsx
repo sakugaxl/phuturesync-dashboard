@@ -80,7 +80,7 @@ const Login: React.FC = () => {
 
   const handleInstagramLogin = async () => {
     try {
-      const response = await fetch('http://api.phuturesync.co.za/instagram'); // Backend generates the OAuth URL
+      const response = await fetch('http://localhost:5000/instagram'); // Backend generates the OAuth URL
       const { url } = await response.json();
       window.location.href = url; // Redirect to Instagram OAuth
     } catch (err) {

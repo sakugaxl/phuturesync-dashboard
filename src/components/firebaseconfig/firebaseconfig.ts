@@ -11,7 +11,7 @@ const firebaseConfig = {
     storageBucket: "phuton-4c3f2.firebasestorage.app",
     messagingSenderId: "219815206389",
     appId: "1:219815206389:web:bd6d5c3a3affaa8fac94bc",
-    measurementId: "G-397WV7BVER",
+    measurementId: "G-397WV7BVER"
 };
 
 // Initialize Firebase

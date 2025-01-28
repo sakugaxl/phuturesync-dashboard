@@ -13,7 +13,7 @@ import PerformanceChart from '../components/dashboard/PerformanceChart';
 import RecommendationsPanel from '../components/dashboard/RecommendationsPanel';
 import ActiveCampaigns from '../components/dashboard/ActiveCampaigns';
 import TopPerformers from '../components/dashboard/TopPerformers';
-// import { fetchAnalyticsData } from '../services/api';
+import { fetchAnalyticsData } from '../services/api';
 
 export default function Dashboard() {
   const [analytics, setAnalytics] = useState<any>(null);
@@ -22,17 +22,17 @@ export default function Dashboard() {
   const [isCampaignsVisible, setIsCampaignsVisible] = useState(true);
   const [isTopPerformersVisible, setIsTopPerformersVisible] = useState(true);
 
-  // useEffect(() => {
-  //   const loadAnalytics = async () => {
-  //     try {
-  //       const data = await fetchAnalyticsData();
-  //       setAnalytics(data);
-  //     } catch (error) {
-  //       console.error('Failed to fetch analytics data:', error);
-  //     }
-  //   };
-  //   loadAnalytics();
-  // }, []);
+  useEffect(() => {
+    const loadAnalytics = async () => {
+      try {
+        const data = await fetchAnalyticsData();
+        setAnalytics(data);
+      } catch (error) {
+        console.error('Failed to fetch analytics data:', error);
+      }
+    };
+    loadAnalytics();
+  }, []);
 
   if (!analytics) {
     return <p className="text-center text-gray-500">Loading analytics...</p>;
