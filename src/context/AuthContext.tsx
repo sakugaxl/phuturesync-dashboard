@@ -1,137 +1,17 @@
-// // AuthContext.tsx
-// import React, { createContext, useContext, useEffect, useState } from 'react';
-// import {
-//   getAuth,
-//   setPersistence,
-//   browserLocalPersistence,
-//   onAuthStateChanged,
-//   signInWithEmailAndPassword,
-//   signOut,
-//   createUserWithEmailAndPassword,
-//   GoogleAuthProvider,
-//   OAuthProvider,
-//   signInWithPopup,
-//   User,
-//   FacebookAuthProvider,
-// } from 'firebase/auth';
-// import { getFirestore, doc, setDoc } from 'firebase/firestore';
-// import '../services/firebaseConfig';
-
-// interface AuthContextType {
-//   isAuthenticated: boolean;
-//   user: User | null;
-//   login: (email: string, password: string) => Promise<void>;
-//   signup: (email: string, password: string, username: string) => Promise<void>;
-//   loginWithGoogle: () => Promise<void>;
-//   loginWithApple: () => Promise<void>;
-//   logout: () => Promise<void>;
-//   loginWithFacebook: () => Promise<void>; 
-// }
-
-// const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-// export function AuthProvider({ children }: { children: React.ReactNode }) {
-//   const [user, setUser] = useState<User | null>(null);
-//   const [isAuthenticated, setIsAuthenticated] = useState(false);
-//   const auth = getAuth();
-//   const db = getFirestore();
-
-//   useEffect(() => {
-//     setPersistence(auth, browserLocalPersistence)
-//       .then(() => {
-//         const unsubscribe = onAuthStateChanged(auth, (user) => {
-//           setUser(user);
-//           setIsAuthenticated(!!user);
-//         });
-//         return () => unsubscribe();
-//       })
-//       .catch((error) => {
-//         console.error('Error setting persistence:', error);
-//       });
-//   }, [auth]);
-
-//   const login = async (email: string, password: string) => {
-//     try {
-//       await signInWithEmailAndPassword(auth, email, password);
-//     } catch (error) {
-//       console.error('Login failed:', error);
-//       throw error;
-//     }
-//   };
-
-//   const signup = async (email: string, password: string, username: string) => {
-//     try {
-//       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-//       const user = userCredential.user;
-
-//       await setDoc(doc(db, 'users', user.uid), {
-//         email: user.email,
-//         username,
-//       });
-
-//       setUser(user);
-//       setIsAuthenticated(true);
-//     } catch (error) {
-//       console.error('Signup failed:', error);
-//       throw error;
-//     }
-//   };
-
-//   const loginWithGoogle = async () => {
-//     const googleProvider = new GoogleAuthProvider();
-//     try {
-//       const result = await signInWithPopup(auth, googleProvider);
-//       setUser(result.user);
-//       setIsAuthenticated(true);
-//     } catch (error) {
-//       console.error('Google login failed:', error);
-//       throw error;
-//     }
-//   };
-
-//   const loginWithApple = async () => {
-//     const appleProvider = new OAuthProvider('apple.com');
-//     try {
-//       const result = await signInWithPopup(auth, appleProvider);
-//       setUser(result.user);
-//       setIsAuthenticated(true);
-//     } catch (error) {
-//       console.error('Apple login failed:', error);
-//       throw error;
-//     }
-//   };
-
-//   export const loginWithFacebook = async () => {
-//     const provider = new FacebookAuthProvider();
-//     return signInWithPopup(auth, provider);
-//   };
-  
-
-//   const logout = async () => {
-//     await signOut(auth);
-//     setIsAuthenticated(false);
-//     setUser(null);
-//   };
-
-//   return (
-//     <AuthContext.Provider value={{ isAuthenticated, user, login, signup, loginWithGoogle, loginWithApple, loginWithFacebook, logout }}>
-//       {children}
-//     </AuthContext.Provider>
-//   );
-// }
-
-// export function useAuth() {
-//   const context = useContext(AuthContext);
-//   if (!context) {
-//     throw new Error('useAuth must be used within an AuthProvider');
-//   }
-//   return context;
-// }
-
-
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { auth } from '../components/firebaseconfig/firebaseconfig';
-import { signInWithPopup, FacebookAuthProvider, createUserWithEmailAndPassword, updateProfile, signInWithEmailAndPassword , GoogleAuthProvider, OAuthProvider } from 'firebase/auth';
+import {
+  signInWithPopup,
+  FacebookAuthProvider,
+  createUserWithEmailAndPassword,
+  updateProfile,
+  signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  OAuthProvider,
+  onAuthStateChanged,
+  User,
+  signOut
+} from 'firebase/auth';
 
 interface AuthContextProps {
   signup: (email: string, password: string, username: string) => Promise<void>;
@@ -139,49 +19,88 @@ interface AuthContextProps {
   loginWithGoogle: () => Promise<void>;
   loginWithApple: () => Promise<void>;
   loginWithFacebook: () => Promise<void>;
+  logout: () => Promise<void>;
+  isAuthenticated: boolean;
+  user: User | null;
+}
+
+interface AuthProviderProps {
+  children: ReactNode;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
-export const AuthProvider: React.FC = ({ children }) => {
-  
- // Updated signup method
-const signup = async (email: string, password: string, username: string) => {
-  try {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    await updateProfile(userCredential.user, { displayName: username });
-  } catch (error) {
-    throw error; // rethrow the error so it can be caught in your component
-  }
-};
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const isAuthenticated = !!user;
 
-const login = async (email: string, password: string) => {
-  try {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    return userCredential.user;
-  } catch (error) {
-    throw error; // rethrow the error so it can be caught in your component
-  }
-};
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
 
-const loginWithGoogle = async () => {
-  const googleProvider = new GoogleAuthProvider();
-  await signInWithPopup(auth, googleProvider);
-};
+  const signup = async (email: string, password: string, username: string) => {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      await updateProfile(userCredential.user, { displayName: username });
+      setUser(userCredential.user);
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const login = async (email: string, password: string) => {
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      setUser(userCredential.user);
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const loginWithGoogle = async () => {
+    try {
+      const googleProvider = new GoogleAuthProvider();
+      const userCredential = await signInWithPopup(auth, googleProvider);
+      setUser(userCredential.user);
+    } catch (error) {
+      throw error;
+    }
+  };
 
   const loginWithApple = async () => {
-    // Add your Apple login logic here
+    try {
+      const appleProvider = new OAuthProvider('apple.com');
+      const userCredential = await signInWithPopup(auth, appleProvider);
+      setUser(userCredential.user);
+    } catch (error) {
+      throw error;
+    }
   };
 
   const loginWithFacebook = async () => {
-    const provider = new FacebookAuthProvider();
-    await signInWithPopup(auth, provider);
+    try {
+      const provider = new FacebookAuthProvider();
+      const userCredential = await signInWithPopup(auth, provider);
+      setUser(userCredential.user);
+    } catch (error) {
+      throw error;
+    }
   };
 
+  const logout = async () => {
+    try {
+      await signOut(auth);
+      setUser(null);
+    } catch (error) {
+      throw error;
+    }
+  };
 
-  
   return (
-    <AuthContext.Provider value={{ signup, login , loginWithGoogle, loginWithApple, loginWithFacebook }}>
+    <AuthContext.Provider value={{ signup, login, loginWithGoogle, loginWithApple, loginWithFacebook, logout, isAuthenticated, user }}>
       {children}
     </AuthContext.Provider>
   );

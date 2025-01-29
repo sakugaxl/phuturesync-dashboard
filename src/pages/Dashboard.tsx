@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   TrendingUp, 
   DollarSign, 
@@ -37,6 +37,7 @@ export default function Dashboard() {
   if (!analytics) {
     return <p className="text-center text-gray-500">Loading analytics...</p>;
   }
+  
 
   return (
     <>

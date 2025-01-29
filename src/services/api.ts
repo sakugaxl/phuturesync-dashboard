@@ -1,6 +1,4 @@
-// api.ts
-
-const API_BASE_URL = import.meta.env.PROD 
+const API_BASE_URL = import.meta.env.PROD
   ? import.meta.env.API_URL || '/api'
   : '/api';
 
@@ -36,6 +34,21 @@ class ApiService {
     return response;
   }
 
+  // Fetch financial data
+  async fetchFinancialData(timeframe: string): Promise<{ financial: any[]; expenses: any[] }> {
+    try {
+      const response = await this.fetchWithAuth(`/financial?timeframe=${timeframe}`);
+      const data = await response.json();
+      return {
+        financial: data.financial,
+        expenses: data.expenses,
+      };
+    } catch (error) {
+      console.error('Error fetching financial data:', error);
+      throw new Error('Failed to fetch financial data');
+    }
+  }
+
   // Fetch analytics data
   async getAnalytics(): Promise<AnalyticsResponse> {
     try {
@@ -63,20 +76,67 @@ class ApiService {
   // Fetch Instagram insights
   async getSocialInsights(): Promise<any> {
     try {
-      const response = await this.fetchWithAuth(`/auth/instagram/insights?metric=impressions,reach,profile_views&period=day&metric_type=total_value`);
+      const response = await this.fetchWithAuth(
+        `/auth/instagram/insights?metric=impressions,reach,profile_views&period=day&metric_type=total_value`
+      );
       const data = await response.json();
       return {
         impressions: data.data.find((metric: any) => metric.name === 'impressions')?.total_value?.value || 0,
         reach: data.data.find((metric: any) => metric.name === 'reach')?.total_value?.value || 0,
         profile_views: data.data.find((metric: any) => metric.name === 'profile_views')?.total_value?.value || 0,
-        // Add more metrics here as needed
       };
     } catch (error) {
       console.error('Error fetching social insights:', error);
       throw new Error('Failed to fetch social insights');
     }
   }
+
+  // Add fetchMarketingData as a class method
+  async fetchMarketingData(timeframe: string): Promise<any> {
+    try {
+      const response = await this.fetchWithAuth(`/marketing?timeframe=${timeframe}`);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error fetching marketing data:', error);
+      throw new Error('Failed to fetch marketing data');
+    }
+  }
+
+  // Add fetchInsightsData as a class method
+  async fetchInsightsData(): Promise<any> {
+    try {
+      const response = await this.fetchWithAuth('/insights');
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error fetching insights data:', error);
+      throw new Error('Failed to fetch insights data');
+    }
+  }
 }
+
+// Export the ApiService instance
+export const api = new ApiService();
+
+export const fetchAnalyticsData = async () => {
+  return await api.getAnalytics();
+};
+
+// Export the existing fetchFinancialData function
+export const fetchFinancialData = async (timeframe: string) => {
+  return await api.fetchFinancialData(timeframe);
+};
+
+// Export the fetchMarketingData function
+export const fetchMarketingData = async (timeframe: string) => {
+  return await api.fetchMarketingData(timeframe);
+};
+
+// Export the fetchInsightsData function
+export const fetchInsightsData = async () => {
+  return await api.fetchInsightsData();
+};
 
 // Interfaces for data structure
 export interface AnalyticsResponse {
@@ -119,4 +179,4 @@ export interface SocialInsights {
   };
 }
 
-export const api = new ApiService();
+console.log("API Base URL:", API_BASE_URL);
