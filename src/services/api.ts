@@ -1,37 +1,39 @@
-const API_BASE_URL = import.meta.env.PROD
-  ? import.meta.env.API_URL || '/api'
-  : '/api';
+const API_BASE_URL = process.env.NODE_ENV === 'production' 
+  ? 'https://api.phuturesync.co.za'
+  : 'http://localhost:3000'; // or whatever your local development port is
 
 class ApiService {
-  readonly baseUrl = API_BASE_URL;
+  private baseUrl: string;
+
+  constructor() {
+    this.baseUrl = API_BASE_URL;
+  }
 
   // Function to fetch data with authorization token
-  private async fetchWithAuth(url: string, options: RequestInit = {}): Promise<Response> {
-    const token = localStorage.getItem('auth_token');
+  private async fetchWithAuth(endpoint: string, options: RequestInit = {}): Promise<Response> {
+    const url = `${this.baseUrl}${endpoint}`;
     const headers = {
       'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
       ...options.headers,
     };
 
-    const response = await fetch(`${this.baseUrl}${url}`, {
-      ...options,
-      headers,
-    });
+    // Add error handling and retry logic
+    try {
+      const response = await fetch(url, {
+        ...options,
+        headers,
+        credentials: 'include', // Important for cookies
+      });
 
-    // Redirect to login if unauthorized
-    if (response.status === 401) {
-      localStorage.removeItem('auth_token');
-      window.location.href = '/login';
-      throw new Error('Unauthorized');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return response;
+    } catch (error) {
+      console.error('API request failed:', error);
+      throw error;
     }
-
-    // Handle non-OK responses
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return response;
   }
 
   // Fetch financial data
