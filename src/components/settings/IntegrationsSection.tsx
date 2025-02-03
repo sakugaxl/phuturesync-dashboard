@@ -1,5 +1,7 @@
+// src/components/settings/IntegrationsSection.tsx
 import { useEffect, useState } from "react";
 import { auth, db, doc, getDoc, setDoc } from "../firebaseconfig/firebaseconfig"; // Import necessary Firestore functions
+
 import {
   Facebook,
   Instagram,

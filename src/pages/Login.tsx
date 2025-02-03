@@ -1,44 +1,59 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { FacebookAuthProvider,signInWithPopup  } from 'firebase/auth';
-import { auth } from "../components/firebaseconfig/firebaseconfig"; // Firebase config file
+import { FacebookAuthProvider, signInWithPopup } from 'firebase/auth';
+import { auth } from "../components/firebaseconfig/firebaseconfig";
 
+// Add Facebook SDK type declarations
+declare global {
+  interface Window {
+    fbAsyncInit: () => void;
+    FB: {
+      init: (config: {
+        appId: string;
+        cookie: boolean;
+        xfbml: boolean;
+        version: string;
+      }) => void;
+      // Add other FB methods if needed
+    };
+  }
+}
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
-
-  const { loginWithGoogle, loginWithApple, login } = useAuth();
+  const { loginWithGoogle, login } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     // Initialize the Facebook SDK
     window.fbAsyncInit = function () {
       window.FB.init({
-        appId: '1329237131404239', // Replace with your App ID
+        appId: '1102166627980497',
         cookie: true,
         xfbml: true,
-        version: 'v14.0', // Use the latest Facebook API version
+        version: 'v14.0',
       });
     };
 
-    // Load Facebook SDK script
+    // Load Facebook SDK script with proper typing
     (function (d, s, id) {
-      var js, fjs = d.getElementsByTagName(s)[0];
+      const fjs = d.getElementsByTagName(s)[0];
       if (d.getElementById(id)) return;
-      js = d.createElement(s);
+      const js = d.createElement(s) as HTMLScriptElement;
       js.id = id;
       js.src = 'https://connect.facebook.net/en_US/sdk.js';
-      fjs.parentNode.insertBefore(js, fjs);
+      if (fjs && fjs.parentNode) {
+        fjs.parentNode.insertBefore(js, fjs);
+      }
     })(document, 'script', 'facebook-jssdk');
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-
     try {
       await login(email, password);
       navigate('/settings');
@@ -56,35 +71,21 @@ const Login: React.FC = () => {
     }
   };
 
-  const handleAppleLogin = async () => {
-    try {
-      await loginWithApple();
-      navigate('/settings');
-    } catch (error) {
-      setError('Apple login failed. Please try again.');
-    }
-  };
-
   const handleFacebookLogin = async () => {
     const provider = new FacebookAuthProvider();
+    // Add required scopes
+    provider.addScope('pages_manage_posts');
+    provider.addScope('pages_read_engagement');
+    provider.addScope('ads_management');
+    provider.addScope('business_management');
+
     try {
       const result = await signInWithPopup(auth, provider);
-      const user = result.user; // Successfully logged-in user
-      console.log("Facebook Login Success:", user);
+      console.log("Facebook Login Success:", result.user);
       navigate('/settings');
     } catch (error: any) {
       console.error("Facebook Login Error:", error);
       setError('Facebook login failed. Please try again.');
-    }
-  };
-
-  const handleInstagramLogin = async () => {
-    try {
-      const response = await fetch('http://localhost:5000/instagram'); // Backend generates the OAuth URL
-      const { url } = await response.json();
-      window.location.href = url; // Redirect to Instagram OAuth
-    } catch (err) {
-      setError('Instagram login failed. Please try again.');
     }
   };
 
@@ -121,18 +122,10 @@ const Login: React.FC = () => {
       <button onClick={handleGoogleLogin} className="btn btn-primary w-full bg-red-500 hover:bg-red-600">
         Log In with Google
       </button>
-{/* 
-      <button onClick={handleAppleLogin} className="btn btn-primary w-full bg-black hover:bg-gray-800 mt-4">
-        Log In with Apple
-      </button> */}
 
       <button onClick={handleFacebookLogin} className="btn btn-primary w-full bg-blue-600 hover:bg-blue-700 mt-4">
         Log In with Facebook
       </button>
-
-      {/* <button onClick={handleInstagramLogin} className="btn btn-primary w-full bg-pink-500 hover:bg-pink-600 mt-4">
-        Log In with Instagram
-      </button> */}
 
       <p className="mt-4 text-center">
         Don’t have an account?{' '}
