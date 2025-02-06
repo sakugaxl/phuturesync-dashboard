@@ -4,15 +4,11 @@ import { auth, db, doc, getDoc, setDoc } from "../firebaseconfig/firebaseconfig"
 
 import {
   Facebook,
-  Instagram,
-  Linkedin,
-  Twitter,
   Settings2,
   CheckCircle2,
   XCircle,
   BarChart,
 } from "lucide-react";
-import { FaTiktok } from "react-icons/fa";
 import { signInWithPopup, FacebookAuthProvider } from "firebase/auth";
 
 // Initial integrations data
@@ -24,33 +20,9 @@ const integrations = [
     connectUrl: `${import.meta.env.VITE_API_URL}/auth/facebook`,
   },
   {
-    name: "Instagram",
-    icon: Instagram,
-    color: "blue",
-    connectUrl: `${import.meta.env.VITE_API_URL}/auth/instagram`,
-  },
-  {
-    name: "LinkedIn",
-    icon: Linkedin,
-    color: "blue",
-    connectUrl: `${import.meta.env.VITE_API_URL}/auth/linkedin`,
-  },
-  {
-    name: "Twitter",
-    icon: Twitter,
-    color: "blue",
-    connectUrl: `${import.meta.env.VITE_API_URL}/auth/twitter`,
-  },
-  {
-    name: "TikTok",
-    icon: FaTiktok,
-    color: "blue",
-    connectUrl: `${import.meta.env.VITE_API_URL}/auth/tiktok`,
-  },
-  {
     name: "Google AdSense",
     icon: BarChart,
-    color: "green",
+    color: "blue",
     connectUrl: `${import.meta.env.VITE_API_URL}/auth/googleAdsense`,
   },
 ];
@@ -65,10 +37,6 @@ export default function IntegrationsSection() {
     Record<string, "connected" | "not-connected">
   >({
     facebook: "not-connected",
-    instagram: "not-connected",
-    linkedin: "not-connected",
-    twitter: "not-connected",
-    tiktok: "not-connected",
     googleAdsense: "not-connected",
   });
 
@@ -128,7 +96,7 @@ export default function IntegrationsSection() {
     <div className="bg-white rounded-xl shadow-sm p-6">
       <h3 className="text-lg font-semibold text-gray-900 mb-4">Integrations</h3>
       <div className="grid gap-4">
-        {integrations.map(({ name, icon: Icon, color, connectUrl }) => {
+        {integrations.map(({ name, icon: Icon, color }) => {
           const platform = name.toLowerCase().replace(" ", "");
           const isConnected = statuses[platform] === "connected";
 

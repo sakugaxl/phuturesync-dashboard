@@ -14,6 +14,8 @@ const Social = React.lazy(() => import('../pages/Social'));
 const Settings = React.lazy(() => import('../pages/Settings'));
 const Login = React.lazy(() => import('../pages/Login'));
 const Signup = React.lazy(() => import('../pages/Signup'));
+const PrivacyPolicy = React.lazy(() => import("../pages/PrivacyPolicy"));
+const TermsOfService = React.lazy(() => import("../pages/TermsOfService"));
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
@@ -29,6 +31,8 @@ export default function AppRoutes() {
         <Route path="/login" element={<Login />} />
         <Route path="/auth-success" element={<AuthSuccess />} />
         <Route path="/auth-failure" element={<AuthFailure />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-of-service" element={<TermsOfService />} />
         <Route
           path="/settings"
           element={

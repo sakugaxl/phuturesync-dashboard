@@ -1,12 +1,15 @@
+// src/pages/Settings.tsx
+
 import React from 'react';
-import { Settings as SettingsIcon, Link } from 'lucide-react';
+import { Settings as SettingsIcon, Link, ShieldIcon } from 'lucide-react';
 import ProfileSection from '../components/settings/ProfileSection';
 import IntegrationsSection from '../components/settings/IntegrationsSection';
+import SecuritySection from '../components/settings/SecuritySection';
 
 const settingsTabs = [
   { id: 'profile', icon: SettingsIcon, label: 'Profile' },
   { id: 'integrations', icon: Link, label: 'Integrations' },
-  // { id: 'notifications', icon: Bell, label: 'Notifications' },
+  { id: 'security', icon: ShieldIcon, label: 'Security' },
   // { id: 'appearance', icon: Palette, label: 'Appearance' },
 ];
 
@@ -41,9 +44,10 @@ export default function Settings() {
         <div className="flex-1">
           {activeTab === 'profile' && <ProfileSection />}
           {activeTab === 'integrations' && <IntegrationsSection />}
+          {activeTab === 'security' && <SecuritySection />}
           {/* Temporarily hidden sections */}
           {/* 
-          {activeTab === 'notifications' && (
+          {activeTab === 'security' && (
             <div className="bg-white rounded-xl shadow-sm p-6">
               <h3 className="text-lg font-semibold text-gray-900">Notification Settings</h3>
               <p className="mt-2 text-gray-600">Configure your notification preferences</p>

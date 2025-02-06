@@ -9,7 +9,6 @@ import {
   TrendingUp, 
   Brain, 
   Share2, 
-  Users, 
   Settings, 
   Shield,
   Menu,
@@ -28,7 +27,6 @@ const menuItems = [
   { icon: Share2, label: 'Social Media', path: '/social' },
   { icon: DollarSign, label: 'Financial Overview', path: '/financial' },
   { icon: Settings, label: 'Settings', path: '/settings' },
-  { icon: Shield, label: 'Security', path: '/security' }
 ];
 
 export default function Sidebar({ onClose }: SidebarProps) {
