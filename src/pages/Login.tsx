@@ -33,7 +33,7 @@ const Login: React.FC = () => {
     // Initialize the Facebook SDK
     window.fbAsyncInit = function () {
       window.FB.init({
-        appId: '1102166627980497',
+        appId: '933838518791010',
         cookie: true,
         xfbml: true,
         version: 'v14.0',
