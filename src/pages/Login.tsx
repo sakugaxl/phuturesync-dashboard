@@ -36,7 +36,7 @@ const Login: React.FC = () => {
         appId: '933838518791010',
         cookie: true,
         xfbml: true,
-        version: 'v14.0',
+        version: 'v22.0',
       });
     };
 
